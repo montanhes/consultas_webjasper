@@ -22,8 +22,11 @@ class ServiceController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->query('per_page', 15);
-        $services = $this->serviceRepository->allPaginated((int)$perPage);
+        $perPage = (int) $request->query('per_page', 15);
+        if ($perPage <= 0) {
+            $perPage = 15;
+        }
+        $services = $this->serviceRepository->allPaginated($perPage);
         return ServiceResource::collection($services)->response();
     }
 
