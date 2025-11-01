@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Consultation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -13,8 +14,8 @@ class UpdateConsultationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // The user can only update their own consultations.
-        $consultation = $this->route('consultation');
+        $consultation = Consultation::find($this->route('consultation'));
+
         return $consultation && $consultation->user_id === Auth::id();
     }
 
@@ -25,7 +26,7 @@ class UpdateConsultationRequest extends FormRequest
      */
     public function rules(): array
     {
-        $consultationId = $this->route('consultation')->id;
+        $consultationId = $this->route('consultation');
 
         return [
             'title' => 'sometimes|required|string|max:255',
