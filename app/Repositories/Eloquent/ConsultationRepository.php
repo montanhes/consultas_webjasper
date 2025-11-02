@@ -30,9 +30,17 @@ class ConsultationRepository implements ConsultationRepositoryInterface
 
     public function createForUser(User $user, array $data): Consultation
     {
-        Cache::tags(["user.{$user->id}.consultations"])->flush();
         $consultation = $user->consultations()->create($data);
+
+        if (isset($data['service_ids'])) {
+            $consultation->services()->attach($data['service_ids']);
+            $consultation->total_price = $consultation->services()->sum('price');
+            $consultation->save();
+        }
+
+        Cache::tags(["user.{$user->id}.consultations"])->flush();
         event(new ConsultationModified($consultation));
+
         return $consultation;
     }
 
@@ -45,8 +53,15 @@ class ConsultationRepository implements ConsultationRepositoryInterface
     {
         $consultation = $this->findById($id);
         if ($consultation) {
-            Cache::tags(["user.{$consultation->user_id}.consultations"])->flush();
             $consultation->update($data);
+
+            if (isset($data['service_ids'])) {
+                $consultation->services()->sync($data['service_ids']);
+                $consultation->total_price = $consultation->services()->sum('price');
+                $consultation->save();
+            }
+
+            Cache::tags(["user.{$consultation->user_id}.consultations"])->flush();
             event(new ConsultationModified($consultation));
             return $consultation;
         }

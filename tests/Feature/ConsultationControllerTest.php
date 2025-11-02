@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Models\Consultation;
 use App\Models\Service;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Illuminate\Support\Facades\Event;
 
-uses(DatabaseTransactions::class);
+uses(RefreshDatabase::class);
 
 test('notification event is dispatched on consultation creation', function () {
     Event::fake();

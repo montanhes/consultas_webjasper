@@ -35,21 +35,7 @@ class ConsultationController extends Controller
      */
     public function store(StoreConsultationRequest $request): JsonResponse
     {
-        $validatedData = $request->validated();
-        $user = Auth::user();
-
-        $consultation = $this->consultationRepository->createForUser($user, [
-            'title' => $validatedData['title'],
-            'scheduled_at' => $validatedData['scheduled_at'],
-            'status' => 'pending',
-        ]);
-
-        if (isset($validatedData['service_ids'])) {
-            $consultation->services()->attach($validatedData['service_ids']);
-
-            $consultation->total_price = $consultation->services()->sum('price');
-            $consultation->save();
-        }
+        $consultation = $this->consultationRepository->createForUser(Auth::user(), $request->validated());
 
         $consultation->load('services', 'user');
 
@@ -75,18 +61,8 @@ class ConsultationController extends Controller
     {
         $this->authorize('update', $consultation);
 
-        $validatedData = $request->validated();
+        $updatedConsultation = $this->consultationRepository->update($consultation->id, $request->validated());
 
-        $this->consultationRepository->update($consultation->id, $validatedData);
-
-        if (isset($validatedData['service_ids'])) {
-            $consultation->services()->sync($validatedData['service_ids']);
-
-            $consultation->total_price = $consultation->services()->sum('price');
-            $consultation->save();
-        }
-
-        $updatedConsultation = $this->consultationRepository->findById($consultation->id);
         $updatedConsultation->load('services', 'user');
 
         return (new ConsultationResource($updatedConsultation))->response();

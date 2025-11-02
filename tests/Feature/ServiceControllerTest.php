@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Service;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
-uses(DatabaseTransactions::class);
+uses(RefreshDatabase::class);
 
 test('unauthenticated user cannot access service endpoints', function () {
     $this->getJson('/api/services')->assertUnauthorized();
