@@ -32,8 +32,9 @@ Siga os passos abaixo para configurar o ambiente de desenvolvimento.
 4.  **Iniciar os Containers Docker**
     O projeto utiliza Laravel Sail para gerenciar o ambiente Docker.
       ```bash
-      sail up -d
+      sail up
       ```
+    **Atenção:** Após executar `sail up`, aguarde alguns instantes para que todos os serviços (especialmente o banco de dados) estejam completamente inicializados antes de prosseguir para o passo 6 (Executar as Migrations e Seeders). Isso evita possíveis erros de conexão com o banco de dados.
 
 5.  **Gerar a Chave da Aplicação**
     ```bash
@@ -67,6 +68,8 @@ Para que as notificações por e-mail sejam processadas, você precisa iniciar u
 ```bash
 sail artisan queue:work
 ```
+
+**Atenção:** Se você alterar as configurações de e-mail no arquivo `.env` (por exemplo, `MAIL_USERNAME`, `MAIL_PASSWORD`), é crucial reiniciar o worker da fila para que as novas configurações sejam carregadas. Caso contrário, os e-mails de notificação podem falhar no envio. Para reiniciar, pare o processo atual (Ctrl+C) e execute o comando novamente.
 
 ## Executando os Testes
 
