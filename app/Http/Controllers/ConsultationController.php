@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreConsultationRequest;
 use App\Http\Requests\UpdateConsultationRequest;
 use App\Http\Resources\ConsultationResource;
+use App\Models\Consultation;
 use App\Repositories\Contracts\ConsultationRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -58,12 +59,10 @@ class ConsultationController extends Controller
     /**
      * Display the specified consultation.
      */
-    public function show(int $id): JsonResponse
+    public function show(Consultation $consultation): JsonResponse
     {
-        $consultation = $this->consultationRepository->findById($id);
-
-        if (!$consultation || $consultation->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Recurso não encontrado ou não autorizado.'], Response::HTTP_NOT_FOUND);
+        if ($consultation->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Não autorizado.'], Response::HTTP_FORBIDDEN);
         }
 
         $consultation->load('services', 'user');
@@ -74,12 +73,10 @@ class ConsultationController extends Controller
     /**
      * Update the specified consultation.
      */
-    public function update(UpdateConsultationRequest $request, int $id): JsonResponse
+    public function update(UpdateConsultationRequest $request, Consultation $consultation): JsonResponse
     {
-        $consultation = $this->consultationRepository->findById($id);
-
-        if (!$consultation || $consultation->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Recurso não encontrado ou não autorizado.'], Response::HTTP_NOT_FOUND);
+        if ($consultation->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Não autorizado.'], Response::HTTP_FORBIDDEN);
         }
 
         $validatedData = $request->validated();
@@ -102,12 +99,10 @@ class ConsultationController extends Controller
     /**
      * Cancel the specified consultation.
      */
-    public function cancel(int $id): JsonResponse
+    public function cancel(Consultation $consultation): JsonResponse
     {
-        $consultation = $this->consultationRepository->findById($id);
-
-        if (!$consultation || $consultation->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Recurso não encontrado ou não autorizado.'], Response::HTTP_NOT_FOUND);
+        if ($consultation->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Não autorizado.'], Response::HTTP_FORBIDDEN);
         }
 
         if ($consultation->status === 'cancelled') {

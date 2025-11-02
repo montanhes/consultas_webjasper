@@ -132,7 +132,7 @@ test('user cannot show another user\'s consultation', function () {
     $consultationOfUserB = Consultation::factory()->create(['user_id' => $userB->id]);
 
     $this->getJson("/api/consultations/{$consultationOfUserB->id}")
-        ->assertNotFound();
+        ->assertForbidden();
 });
 
 test('user can update their own consultation', function () {
@@ -178,7 +178,7 @@ test('user cannot cancel another user\'s consultation', function () {
     $consultationOfUserB = Consultation::factory()->create(['user_id' => $userB->id]);
 
     $this->patchJson("/api/consultations/{$consultationOfUserB->id}/cancel")
-        ->assertNotFound();
+        ->assertForbidden();
 });
 
 test('cannot cancel an already cancelled consultation', function () {

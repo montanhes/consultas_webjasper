@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
+use App\Models\Service;
 use App\Repositories\Contracts\ServiceRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -42,44 +43,26 @@ class ServiceController extends Controller
     /**
      * Display the specified service.
      */
-    public function show(int $id): JsonResponse
+    public function show(Service $service): JsonResponse
     {
-        $service = $this->serviceRepository->findById($id);
-
-        if (!$service) {
-            return response()->json(['message' => 'Recurso não encontrado.'], Response::HTTP_NOT_FOUND);
-        }
-
         return (new ServiceResource($service))->response();
     }
 
     /**
      * Update the specified service.
      */
-    public function update(UpdateServiceRequest $request, int $id): JsonResponse
+    public function update(UpdateServiceRequest $request, Service $service): JsonResponse
     {
-        $service = $this->serviceRepository->findById($id);
-
-        if (!$service) {
-            return response()->json(['message' => 'Recurso não encontrado.'], Response::HTTP_NOT_FOUND);
-        }
-
-        $updatedService = $this->serviceRepository->update($id, $request->validated());
+        $updatedService = $this->serviceRepository->update($service->id, $request->validated());
         return (new ServiceResource($updatedService))->response();
     }
 
     /**
      * Remove the specified service.
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(Service $service): JsonResponse
     {
-        $service = $this->serviceRepository->findById($id);
-
-        if (!$service) {
-            return response()->json(['message' => 'Recurso não encontrado.'], Response::HTTP_NOT_FOUND);
-        }
-
-        $this->serviceRepository->delete($id);
+        $this->serviceRepository->delete($service->id);
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }

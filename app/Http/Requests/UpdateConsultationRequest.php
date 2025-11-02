@@ -14,7 +14,7 @@ class UpdateConsultationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $consultation = Consultation::find($this->route('consultation'));
+        $consultation = $this->route('consultation');
 
         return $consultation && $consultation->user_id === Auth::id();
     }
