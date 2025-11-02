@@ -6,10 +6,38 @@ use App\Models\Consultation;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-
 use Laravel\Sanctum\Sanctum;
+use Illuminate\Support\Facades\Event;
 
 uses(DatabaseTransactions::class);
+
+test('notification event is dispatched on consultation creation', function () {
+    Event::fake();
+
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    $consultationData = [
+        'title' => 'New Consultation for Event Test',
+        'scheduled_at' => now()->addDays(5)->toDateTimeString(),
+    ];
+
+    $this->postJson('/api/consultations', $consultationData);
+
+    Event::assertDispatched(\App\Events\ConsultationModified::class);
+});
+
+test('notification event is dispatched on consultation update', function () {
+    Event::fake();
+
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+    $consultation = Consultation::factory()->create(['user_id' => $user->id]);
+
+    $this->putJson("/api/consultations/{$consultation->id}", ['title' => 'Updated Title']);
+
+    Event::assertDispatched(\App\Events\ConsultationModified::class);
+});
 
 test('unauthenticated user cannot access consultation endpoints', function () {
     $this->getJson('/api/consultations')->assertUnauthorized();
@@ -163,8 +191,6 @@ test('cannot cancel an already cancelled consultation', function () {
         ->assertBadRequest();
 });
 
-// New tests added below
-
 test('cannot create consultation with non-existent service_id', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
@@ -172,7 +198,7 @@ test('cannot create consultation with non-existent service_id', function () {
     $consultationData = [
         'title' => 'Consultation with Invalid Service',
         'scheduled_at' => now()->addDays(7)->toDateTimeString(),
-        'service_ids' => [999], // Non-existent service ID
+        'service_ids' => [999],
     ];
 
     $this->postJson('/api/consultations', $consultationData)
@@ -193,7 +219,7 @@ test('total_price is recalculated when services are removed', function () {
 
     $this->putJson("/api/consultations/{$consultation->id}", [
         'title' => 'Updated Title',
-        'service_ids' => [], // Remove all services
+        'service_ids' => [],
     ])
         ->assertOk()
         ->assertJsonFragment(['total_price' => 0.00]);
@@ -212,7 +238,7 @@ test('cannot update consultation to a conflicting time', function () {
     $consultationToUpdate = Consultation::factory()->create(['user_id' => $user->id, 'scheduled_at' => $time2]);
 
     $this->putJson("/api/consultations/{$consultationToUpdate->id}", [
-        'scheduled_at' => $time1, // Try to move to the conflicting time
+        'scheduled_at' => $time1,
     ])
         ->assertStatus(422)
         ->assertJsonValidationErrors('scheduled_at');
@@ -220,7 +246,6 @@ test('cannot update consultation to a conflicting time', function () {
 
 test('index returns an empty list for a user with no consultations', function () {
     $userWithNoConsultations = User::factory()->create();
-    // Another user has consultations, to ensure we are filtering correctly
     User::factory()->has(Consultation::factory()->count(3))->create();
 
     Sanctum::actingAs($userWithNoConsultations);

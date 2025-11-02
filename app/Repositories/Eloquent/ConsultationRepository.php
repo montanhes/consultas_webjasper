@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Events\ConsultationModified;
 use App\Models\Consultation;
 use App\Models\User;
 use App\Repositories\Contracts\ConsultationRepositoryInterface;
@@ -30,7 +31,9 @@ class ConsultationRepository implements ConsultationRepositoryInterface
     public function createForUser(User $user, array $data): Consultation
     {
         Cache::tags(["user.{$user->id}.consultations"])->flush();
-        return $user->consultations()->create($data);
+        $consultation = $user->consultations()->create($data);
+        event(new ConsultationModified($consultation));
+        return $consultation;
     }
 
     public function findById(int $id): ?Consultation
@@ -44,7 +47,7 @@ class ConsultationRepository implements ConsultationRepositoryInterface
         if ($consultation) {
             Cache::tags(["user.{$consultation->user_id}.consultations"])->flush();
             $consultation->update($data);
-
+            event(new ConsultationModified($consultation));
             return $consultation;
         }
         return null;
