@@ -81,6 +81,8 @@ sail test
 
 ## Variáveis de Ambiente (.env)
 
+Para a maioria das funcionalidades, as configurações padrão no `.env.example` são suficientes. Para testar o envio de e-mails, você precisará configurar apenas as variáveis `MAIL_USERNAME` e `MAIL_PASSWORD` com suas credenciais do Mailtrap.
+
 As seguintes variáveis no arquivo `.env` são importantes para a configuração do projeto:
 
 | Variável              | Descrição                                                                                             | Valor Padrão (Recomendado) |
