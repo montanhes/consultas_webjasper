@@ -61,9 +61,7 @@ class ConsultationController extends Controller
      */
     public function show(Consultation $consultation): JsonResponse
     {
-        if ($consultation->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Não autorizado.'], Response::HTTP_FORBIDDEN);
-        }
+        $this->authorize('view', $consultation);
 
         $consultation->load('services', 'user');
 
@@ -75,9 +73,7 @@ class ConsultationController extends Controller
      */
     public function update(UpdateConsultationRequest $request, Consultation $consultation): JsonResponse
     {
-        if ($consultation->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Não autorizado.'], Response::HTTP_FORBIDDEN);
-        }
+        $this->authorize('update', $consultation);
 
         $validatedData = $request->validated();
 
@@ -101,9 +97,7 @@ class ConsultationController extends Controller
      */
     public function cancel(Consultation $consultation): JsonResponse
     {
-        if ($consultation->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Não autorizado.'], Response::HTTP_FORBIDDEN);
-        }
+        $this->authorize('cancel', $consultation);
 
         if ($consultation->status === 'cancelled') {
             return response()->json(['message' => 'A consulta já está cancelada.'], Response::HTTP_BAD_REQUEST);
