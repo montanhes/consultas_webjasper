@@ -84,7 +84,10 @@ As seguintes variáveis no arquivo `.env` são importantes para a configuração
 | --------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------- |
 | `DB_CONNECTION`       | Conexão de banco de dados. O Sail gerencia isso.                                                      | `mysql`                    |
 | `DB_HOST`             | Host do banco de dados. O Sail gerencia isso.                                                         | `mysql`                    |
-| `CACHE_DRIVER`        | Driver de cache. Deve ser `redis` para usar o cache de listagens.                                     | `redis`                    |
+| `DB_DATABASE`         | Nome do banco de dados. O Sail gerencia isso.                                                          | `consultas_webjasper`      |
+| `DB_USERNAME`         | Usuário do banco de dados. O Sail gerencia isso.                                                       | `sail`                     |
+| `DB_PASSWORD`         | Senha do banco de dados. O Sail gerencia isso.                                                         | `password`                 |
+| `CACHE_STORE`        | Driver de cache. Deve ser `redis` para usar o cache de listagens.                                     | `redis`                    |
 | `QUEUE_CONNECTION`    | Driver da fila. Deve ser `redis` para processar jobs em segundo plano.                                | `redis`                    |
 | `REDIS_HOST`          | Host do Redis. O Sail gerencia isso.                                                                  | `redis`                    |
 | `MAIL_MAILER`         | Driver de e-mail.                                                                                     | `smtp`                     |
